@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+### This script creates a full, level-0, or incremental, level-1, tar.gz backup from a folder specified on the command line to $STORAGEDIR/SUBFOLDER.
+### It will keep only one level-1 backup!
+###
+### Example folder structure:
+### /var/www
+### /var/www/site1
+### /var/www/site2
+### /var/www/site3
+###
+### Full Backup: backupfolders FULL /var/www
+### Result:
+### $STORAGEDIR/site1/[site1.0.tar.gz | site1.snar.full]
+### $STORAGEDIR/site2/[site2.0.tar.gz | site2.snar.full]
+### $STORAGEDIR/site3/[site3.0.tar.gz | site3.snar.full]
+###
+### Incremental Backup: backupfolders INCR /var/www
+### Result:
+### $STORAGEDIR/site1/[site1.1.tar.gz | site2.snar]
+### $STORAGEDIR/site2/[site2.1.tar.gz | site2.snar]
+### $STORAGEDIR/site3/[site3.1.tar.gz | site3.snar]
+###
+### Logfile will be written to $LOGDIR. There is no logrotate.
+###
+### Example cron entry, will create a full backup on every first day of the week and incremental on all other days.
+###
+### 10 2 * * 2,3,4,5,6,7 /usr/local/sbin/backupfolders INCR /var/www
+### 10 2 * * 1 /usr/local/sbin/backupfolders FULL /var/www
+###
+### Additionally, you can define two kinds of excludes via the corresponding arrays.
+### TAR_EXCLUDES will ignore everything containing one of these patterns but backup the rest.
+### FOLDERS_EXCLUDES will ignore the complete subfolder (e.g. site1).
+###
+### How to Restore
+### At first you need to restore the full backup.
+### tar --listed-incremental=/dev/null -xzf $STORAGEDIR/site1/site1.0.tar.gz
+###
+### Restore incremental backup.
+### tar --listed-incremental=/dev/null -xzf $STORAGEDIR/site1/site1.1.tar.gz
+###
+### Written by Madic - madic@geekbundle.org 2018-05
+
+start=$(date +%s)
+
+### Directories
+BACKUP_TYPE="$1"
+NOWD=$(date +"%Y-%m-%d")
+STORAGEDIR="/opt/backup/folders"
+LOGDIR="/opt/backup/log"
+
+### Defaults
+SENDMAIL="1"
+MAILREC="webmaster@geekbundle.org"
+FQDN=$(hostname -f)
+LOG="$LOGDIR/$NOWD-folders-backup.log"
+TAR_EXCLUDES=(.git
+	*backup*
+	*backpwpup*
+	*upgrade*
+	*wp-clone*
+	*cache*
+	*updraft*
+)
+TAR_EXCLUDE_OPTIONS=()
+
+### Folders to backup
+FOLDERS=($(ls $2))
+FOLDERS_EXCLUDES=(riot
+	matrix
+)
+
+USAGE() {
+	echo -e "Usage: ${0##*/} [FULL|INCR] PATH-TO-BACKUP"
+	exit 1
+}
+if [ -z "$1" ] || [ -z "$2" ]; then USAGE; fi
+
+# Write to $LOGDIR
+exec &>"$LOG"
+
+# Prepare full backup
+if [ "$BACKUP_TYPE" = "FULL" ]; then rm -rf "$STORAGEDIR"; fi
+
+# Remove leading and trailing / for tar transform and tar directory change
+FOLDERS_PATH="$(echo -e $2 | sed 's/^\/\(.*\)\/$/\1/g')"
+
+# Create directories if not exist
+DIRS="$STORAGEDIR $LOGDIR"
+set -- $DIRS
+for i in "$@"; do
+	if [ ! -d "$i" ]; then mkdir -p "$i"; fi
+	if [ ! "$?" = "0" ]; then echo "$(date +"%Y-%m-%d %H:%M:%S") Error: Couldn't create folder $i. Check folder permissions and/or disk quota!" >>"/tmp/$NOWD-folders-backup.log"; fi
+done
+
+# Build exclude commands
+for i in "${TAR_EXCLUDES[@]}"; do TAR_EXCLUDE_OPTIONS+=(--exclude="$i"); done
+
+# Remove FOLDERS_EXCLUDES from dirs to backup
+for del in ${FOLDERS_EXCLUDES[@]}; do FOLDERS=("${FOLDERS[@]/$del/}"); done
+
+# Create file backup
+for i in ${FOLDERS[*]}; do
+	if [ "$BACKUP_TYPE" = "FULL" ]; then
+		mkdir -p "$STORAGEDIR"/"$i"
+		TAR_FILENAME="$i".0.tar.gz
+	fi
+	if [ "$BACKUP_TYPE" = "INCR" ]; then
+		cp "$STORAGEDIR"/"$i"/"$i".snar.full "$STORAGEDIR"/"$i"/"$i".snar
+		TAR_FILENAME="$i".1.tar.gz
+	fi
+	echo "$(date +"%Y-%m-%d %H:%M:%S") Creating file backup of $i to $STORAGEDIR/$i/$TAR_FILENAME..."
+	tar --listed-incremental="$STORAGEDIR"/"$i"/"$i".snar --no-check-device "${TAR_EXCLUDE_OPTIONS[@]}" -czpf "$STORAGEDIR"/"$i"/"$TAR_FILENAME" --transform "s,^$FOLDERS_PATH/$i,$i," -C / "$FOLDERS_PATH"/"$i"
+	if [ "$?" -ne 0 ]; then echo "$(date +"%Y-%m-%d %H:%M:%S") Error in tar command"; fi
+	if [ "$BACKUP_TYPE" = "FULL" ]; then mv "$STORAGEDIR"/"$i"/"$i".snar "$STORAGEDIR"/"$i"/"$i".snar.full; fi
+done
+
+end=$(($(date +%s) - $start))
+runtime=$(date -u -d @${end} +"%T")
+echo "$(date +"%Y-%m-%d %H:%M:%S") Script runtime: $runtime"
+
+# If error, send mail with contents of logfile
+if [ "$SENDMAIL" == "1" ]; then
+	if grep -q 'Error' "$LOG" || grep -q 'Error' "/tmp/$NOWD-folders-backup.log" &>/dev/null; then
+		IFS=
+		MESSAGE=$(cat "$LOG" && cat "/tmp/$NOWD-folders-backup.log")
+		echo $MESSAGE | mail -s "$FQDN - Folders Backuplog" "$MAILREC"
+	fi
+fi
