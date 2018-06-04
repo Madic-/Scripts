@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 ### Use with nagios event handler.
+###
 
 SERVICESTATE="$1"
 SERVICESTATETYPE="$2"
