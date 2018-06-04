@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### Use with nagios event handler. 
+### Use with nagios event handler.
 ### Based on https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/eventhandlers.html
 ### Written for check_mk and https://www.geekbundle.org/selbstheilung-mit-check_mk-event-handler
 ###
