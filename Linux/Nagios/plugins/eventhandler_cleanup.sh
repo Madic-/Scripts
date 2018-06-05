@@ -19,6 +19,12 @@ CLEANUP() {
 
 case "$SERVICESTATE" in
 OK)
+    case "$SERVICESTATETYPE" in
+    SOFT)
+        ;;
+    HARD)
+        ;;
+    esac
 	;;
 WARNING)
     case "$SERVICESTATETYPE" in
@@ -30,6 +36,12 @@ WARNING)
     esac
 	;;
 UNKNOWN)
+    case "$SERVICESTATETYPE" in
+    SOFT)
+        ;;
+    HARD)
+        ;;
+    esac
 	;;
 CRITICAL)
 	case "$SERVICESTATETYPE" in
