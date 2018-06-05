@@ -12,10 +12,22 @@ LOG=~/var/log/eventhandler.log
 
 exec &>"$LOG"
 
+CLEANUP() {
+    echo "$(date +"%Y-%m-%d %H:%M:%S") Doing cleanup on $HOSTADDRESS through ${0##*/} Script..."
+    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no user@"$HOSTADDRESS" sudo /usr/local/sbin/cleanup.sh
+}
+
 case "$SERVICESTATE" in
 OK)
 	;;
 WARNING)
+    case "$SERVICESTATETYPE" in
+    SOFT)
+        ;;
+    HARD)
+        CLEANUP
+        ;;
+    esac
 	;;
 UNKNOWN)
 	;;
@@ -24,8 +36,7 @@ CRITICAL)
 	SOFT)
         ;;
 	HARD)
-        echo "$(date +"%Y-%m-%d %H:%M:%S") Doing cleanup on $HOSTADDRESS through ${0##*/} Script..."
-        ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no user@"$HOSTADDRESS" sudo /usr/local/sbin/cleanup.sh
+        CLEANUP
 		;;
 	esac
 	;;
