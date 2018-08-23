@@ -38,7 +38,7 @@
 ### Restore incremental backup.
 ### tar --listed-incremental=/dev/null -xzf $STORAGEDIR/site1/site1.1.tar.gz
 ###
-### Written by Madic - madic@geekbundle.org 2018-05
+### Written by Michael Neese - madic@geekbundle.org 2018-05
 
 start=$(date +%s)
 
