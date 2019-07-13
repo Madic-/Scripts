@@ -1,6 +1,6 @@
 # sendtomatrix
 
-Send a (multiline) message to a matrix room.
+Send a (multiline) message to a [matrix room](https://matrix.org) hosted on a [synapse server](https://github.com/matrix-org/synapse).
 
 ## Usage
 
