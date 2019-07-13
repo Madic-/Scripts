@@ -2,6 +2,8 @@
 
 Linux shell script to send a (multiline) message to a [matrix room](https://matrix.org) hosted on a [synapse server](https://github.com/matrix-org/synapse).
 
+Usable for e.g. cronjobs, nagios notifications or ci pipelines.
+
 ## Usage
 
 This script expects data to be piped in on STDIN.
