@@ -106,4 +106,4 @@ if [ -z "$MATRIX_USER" ] || [ -z "$MATRIX_PASS" ] || [ -z "$MATRIX_SERVER" ] || 
 MATRIX_ACCESS_TOKEN=$(curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token')
 
 # Send Message
-curl -s -o /dev/null -X POST -d "$(jq -Rsc --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
+curl -s -o /dev/null -X POST -d "$(jq -Rs --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
