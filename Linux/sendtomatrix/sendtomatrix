@@ -91,6 +91,8 @@ done
 
 # Test if stdin is not empty
 [ -t 0 ] && USAGE
+
+# Read parameters from config file
 if [ -f "$CONFIG_FILE" ]; then source "$CONFIG_FILE"; fi
 
 # Override config file values with the values from the command line
