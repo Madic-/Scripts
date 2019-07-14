@@ -32,7 +32,7 @@ Please keep an eye on the format of the RoomID!
 
 ## Configuration file
 
-The configuration file can contain the following values.
+The configuration file can contain the following values:
 
 ```bash
 MATRIX_USER=TestUser
