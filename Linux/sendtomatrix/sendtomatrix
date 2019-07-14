@@ -102,11 +102,6 @@ if [ -n "$MATRIX_ROOM_ID_TEMP" ]; then MATRIX_ROOM_ID="$MATRIX_ROOM_ID_TEMP"; fi
 # Test if all required variables are not empty
 if [ -z "$MATRIX_USER" ] || [ -z "$MATRIX_PASS" ] || [ -z "$MATRIX_SERVER" ] || [ -z "$MATRIX_ROOM_ID" ]; then USAGE; fi
 
-echo "$MATRIX_USER"
-echo "$MATRIX_PASS"
-echo "$MATRIX_SERVER"
-echo "$MATRIX_ROOM_ID"
-
 # Get Matrix Access Token
 MATRIX_ACCESS_TOKEN=$(curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token')
 
