@@ -73,5 +73,11 @@ It's also possible to use this script to send the output of a cronjob to a matri
 Example:
 
 ```bash
+SHELL=/bin/bash
 0 4 * * * root /usr/local/sbin/random_script | sendtomatrix -f /etc/sendtomatrix.conf
+0 5 * * * OUTPUT="# $(hostname -f) - random_script" && OUTPUT="$OUTPUT\n" && echo -e "$OUTPUT" | sendtomatrix -f /etc/sendtomatrix.conf
 ```
+
+The last example allows appending e.g. the fqdn of the server and custom text to a message.
+
+With this approach it's possible to send the same message from different servers to the same room and still be able to keep track from which server the message originates.
