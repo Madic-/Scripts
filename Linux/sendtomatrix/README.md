@@ -25,10 +25,10 @@ COMMAND | sendtomatrix [OPTION]
 You can either provide an access token or username / password.
 If no access token is provided, this script will get one for you from the server.
 
-But keep in mind that every time this script runs without an access token a new access token is created and fills up your device list!
+But keep in mind, that every time this script runs without an access token, a new access token is created and fills up your device list.
 With to many devices in your device list, there is a potential getting blacklisted.
 
-So the recommended way is to provide an access token.
+The recommended way is to provide an access token.
 
 ### Getting an access token from the server
 
@@ -49,6 +49,7 @@ Please keep an eye on the format of the RoomID!
 
 * [Synapse server](https://github.com/matrix-org/synapse) as API endpoint
 * jq on the system which runs the script
+* Before you can send a message to a room, the user already needs to have joined it
 
 ## Configuration file
 
