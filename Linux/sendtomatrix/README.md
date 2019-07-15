@@ -49,7 +49,7 @@ Please keep an eye on the format of the RoomID!
 
 * [Synapse server](https://github.com/matrix-org/synapse) as API endpoint
 * jq on the system which runs the script
-* Before you can send a message to a room, the user already needs to have joined it
+* Before you can send a message to a room, the user sending the message already needs to have joined it
 
 ## Configuration file
 

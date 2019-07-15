@@ -55,7 +55,7 @@ The recommended way is to provide an access token.
 Getting an access token from the server:
 curl -s -X POST -d '{ \"type\":\"m.login.password\", \"user\":\"\$MATRIX_USER\", \"password\":\"\$MATRIX_PASS\" }' \"https://\$MATRIX_SERVER/_matrix/client/r0/login\" | jq -r '.access_token'
 
-Before you can send a message to a room, the user already needs to have joined it.
+Before you can send a message to a room, the user sending the message already needs to have joined it.
 
 Examples:
 echo \"Testmessage 1\" | ${0##*/} -f /etc/${0##*/}.conf
