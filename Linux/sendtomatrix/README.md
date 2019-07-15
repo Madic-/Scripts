@@ -30,7 +30,6 @@ With to many devices in your device list, there is a potential getting blacklist
 
 So the recommended way is to provide an access token.
 
-
 ### Getting an access token from the server
 
 ```bash
