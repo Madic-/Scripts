@@ -14,7 +14,7 @@
 ## If not, see http://www.gnu.org/licenses/.
 
 ## This script sends a message to a matrix room <https://matrix.org>.
-## Requires a matrix synapse (https://github.com/matrix-org/synapse) server as endpoint.
+## Requires a matrix synapse (https://github.com/matrix-org/synapse) server as endpoint and jq oin the system which runs the script.
 ## Usable for e.g. cronjobs, nagios notifications or ci pipelines.
 
 AUTHOR="Michael Neese <madic@geekbundle.org>"
@@ -22,6 +22,12 @@ MATRIX_USER_TEMP=""
 MATRIX_PASS_TEMP=""
 MATRIX_SERVER_TEMP=""
 MATRIX_ROOM_ID_TEMP=""
+
+# Check if jq is installed
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: jq is not installed.'
+  exit 1
+fi
 
 USAGE() {
   echo "Usage: COMMAND | ${0##*/} [OPTION]

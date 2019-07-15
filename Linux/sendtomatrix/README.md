@@ -30,6 +30,11 @@ echo "Testmessage 2" | sendtomatrix -f /etc/sendtomatrix.conf -r "\!QtykxKocfZaZ
 
 Please keep an eye on the format of the RoomID!
 
+## Requirements
+
+* [Synapse server](https://github.com/matrix-org/synapse) as API endpoint
+* jq on the system which runs the script
+
 ## Configuration file
 
 The configuration file can contain the following values:
