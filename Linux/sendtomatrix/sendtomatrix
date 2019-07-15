@@ -14,7 +14,7 @@
 ## If not, see http://www.gnu.org/licenses/.
 
 ## This script sends a message to a matrix room <https://matrix.org>.
-## Requires a matrix synapse (https://github.com/matrix-org/synapse) server as endpoint and jq oin the system which runs the script.
+## Requires a matrix synapse (https://github.com/matrix-org/synapse) server as endpoint and jq on the system which runs the script.
 ## Usable for e.g. cronjobs, nagios notifications or ci pipelines.
 
 AUTHOR="Michael Neese <madic@geekbundle.org>"
