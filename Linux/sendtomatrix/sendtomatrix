@@ -22,6 +22,7 @@ MATRIX_USER_TEMP=""
 MATRIX_PASS_TEMP=""
 MATRIX_SERVER_TEMP=""
 MATRIX_ROOM_ID_TEMP=""
+MATRIX_ACCESS_TOKEN_TEMP=""
 
 # Check if jq is installed
 if ! [ -x "$(command -v jq)" ]; then
@@ -37,10 +38,20 @@ This script expects data to be piped in on STDIN.
 Options:
   -u Matrix User Name
   -p Matrix User Password
+  -a Matrix Access Token
   -s Matrix Server FQDN
   -r Matrix RoomID
   -f Optional configuration file
   -h Show help message
+
+You can either provide an access token or username / password.
+If no access token is provided, this script will get one for you from the server.
+But keep in mind that every time this script runs without an access token a new access token is created and fills up your device list!
+With to many devices in your device list, there is a potential getting blacklisted.
+So the recommended way is to provide an access token.
+
+Getting an access token from the server:
+curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"\$MATRIX_USER\", \"password\":\"\$MATRIX_PASS\" }" "https://\$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token'
 
 Examples:
 echo \"Testmessage 1\" | ${0##*/} -f /etc/${0##*/}.conf
@@ -52,6 +63,7 @@ The configuration file can contain the following values.
 
 MATRIX_USER=TestUser
 MATRIX_PASS=TestPassword
+MATRIX_ACCESS_TOKEN=MD..blah
 MATRIX_SERVER=matrix.org
 # RoomID from the #matrix:matrix.org Channel
 MATRIX_ROOM_ID=\"!QtykxKocfZaZOUrTwp:matrix.org\"
@@ -69,7 +81,7 @@ Homepage: <https://www.geekbundle.org>"
   exit 1
 }
 
-while getopts ":f:u:p:s:r:h" opt; do
+while getopts ":f:u:a:p:s:r:h" opt; do
   case "$opt" in
   f)
     CONFIG_FILE="$OPTARG"
@@ -79,6 +91,9 @@ while getopts ":f:u:p:s:r:h" opt; do
     ;;
   p)
     MATRIX_PASS_TEMP="$OPTARG"
+    ;;
+  a)
+    MATRIX_ACCESS_TOKEN_TEMP="$OPTARG"
     ;;
   s)
     MATRIX_SERVER_TEMP="$OPTARG"
@@ -104,14 +119,17 @@ if [ -f "$CONFIG_FILE" ]; then source "$CONFIG_FILE"; fi
 # Override config file values with the values from the command line
 if [ -n "$MATRIX_USER_TEMP" ]; then MATRIX_USER="$MATRIX_USER_TEMP"; fi
 if [ -n "$MATRIX_PASS_TEMP" ]; then MATRIX_PASS="$MATRIX_PASS_TEMP"; fi
+if [ -n "$MATRIX_ACCESS_TOKEN_TEMP" ]; then MATRIX_ACCESS_TOKEN="$MATRIX_ACCESS_TOKEN_TEMP"; fi
 if [ -n "$MATRIX_SERVER_TEMP" ]; then MATRIX_SERVER="$MATRIX_SERVER_TEMP"; fi
 if [ -n "$MATRIX_ROOM_ID_TEMP" ]; then MATRIX_ROOM_ID="$MATRIX_ROOM_ID_TEMP"; fi
 
 # Test if all required variables are not empty
 if [ -z "$MATRIX_USER" ] || [ -z "$MATRIX_PASS" ] || [ -z "$MATRIX_SERVER" ] || [ -z "$MATRIX_ROOM_ID" ]; then USAGE; fi
 
-# Get Matrix Access Token
-MATRIX_ACCESS_TOKEN=$(curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token')
+# Get Matrix Access Token if none provided
+if [ -z "$MATRIX_ACCESS_TOKEN" ]; then
+  MATRIX_ACCESS_TOKEN=$(curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token')
+fi
 
 # Send Message
 curl -s -o /dev/null -X POST -d "$(jq -Rs --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
