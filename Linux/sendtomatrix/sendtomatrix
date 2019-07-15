@@ -23,6 +23,8 @@ MATRIX_PASS_TEMP=""
 MATRIX_SERVER_TEMP=""
 MATRIX_ROOM_ID_TEMP=""
 MATRIX_ACCESS_TOKEN_TEMP=""
+# Allowed values: 0 and 1
+DEBUG=${DEBUG:-"0"}
 
 # Check if jq is installed
 if ! [ -x "$(command -v jq)" ]; then
@@ -131,5 +133,18 @@ if [ -z "$MATRIX_ACCESS_TOKEN" ]; then
   MATRIX_ACCESS_TOKEN=$(curl -s -X POST -d "{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token')
 fi
 
-# Send Message
-curl -s -o /dev/null -X POST -d "$(jq -Rs --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
+# Some debug code
+if [ "$DEBUG" -eq 1 ]; then
+  echo "curl -s -X POST -d \"{ \"type\":\"m.login.password\", \"user\":\"$MATRIX_USER\", \"password\":\"$MATRIX_PASS\" }\" \"https://$MATRIX_SERVER/_matrix/client/r0/login\" | jq -r '.access_token'"
+  echo -e "\nMatrix Access Token: $MATRIX_ACCESS_TOKEN"
+fi
+
+# Send Message and output errors on DEBUG=1
+if [ "$DEBUG" -eq 1 ]; then
+  curl -X POST -d "$(jq -Rs --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
+fi
+
+# Send message without any output if DEBUG < 1
+if [ "$DEBUG" -lt 1 ]; then
+  curl -s -o /dev/null -X POST -d "$(jq -Rs --arg msgtype m.text '{$msgtype, body:.}')" "https://$MATRIX_SERVER/_matrix/client/r0/rooms/$MATRIX_ROOM_ID/send/m.room.message?access_token=$MATRIX_ACCESS_TOKEN"
+fi
