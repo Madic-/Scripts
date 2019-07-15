@@ -33,7 +33,7 @@ So the recommended way is to provide an access token.
 ### Getting an access token from the server
 
 ```bash
-curl -s -X POST -d "{ "type":"m.login.password", "user":"$MATRIX_USER", "password":"$MATRIX_PASS" }" "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token'
+curl -s -X POST -d '{ "type":"m.login.password", "user":"$MATRIX_USER", "password":"$MATRIX_PASS" }' "https://$MATRIX_SERVER/_matrix/client/r0/login" | jq -r '.access_token'
 ```
 
 ### Examples
