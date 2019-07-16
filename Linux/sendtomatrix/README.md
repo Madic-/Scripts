@@ -88,6 +88,6 @@ The sendtomatrix-wrapper-nagios script is an example notification script for nag
 
 It requires an installed and configured sendtomatrix script because it just formats and then pipes a message to it.
 
-In check_mk it can be used as is. If you wand to use it with other monitoring cores you need to change the variables.
+In check_mk it can be used as is. If you wand to use it with other monitoring cores you maybe need to adjust the variables.
 
 ![Nagios Notification](nagios-notification.png)
