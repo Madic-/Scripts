@@ -86,4 +86,8 @@ With this approach it's possible to send the same message from different servers
 
 The sendtomatrix-wrapper-nagios script is an example notification script for nagios compatible monitoring systems.
 
+It requires an installed and configured sendtomatrix script because it just formats and then pipes a message to it.
+
+In check_mk it can be used as is. If you wand to use it with other monitoring cores you need to change the variables.
+
 ![Nagios Notification](nagios-notification.png)
