@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Send Nagios Notification to Matrix Channel
+# Based on https://www.freelock.com/blog/john-locke/2017-09/post-nagiosicinga-alerts-matrix-room
+
+warn_ico="⚠"
+error_ico="❌"
+ok_ico="✔"
+question_ico="❓"
+
+#Set the message icon based on service state
+if [ "$NOTIFY_HOSTSTATE" = "UP" ]; then
+  ICON=$ok_ico
+elif [ "$NOTIFY_HOSTSTATE" = "DOWN" ] || [ "$NOTIFY_HOSTSTATE" = "UNREACHABLE" ]; then
+  ICON=$error_ico
+fi
+
+if [ "$NOTIFY_SERVICESTATE" = "UNKNOWN" ]; then
+  ICON=$question_ico
+elif [ "$NOTIFY_SERVICESTATE" = "OK" ]; then
+  ICON=$ok_ico
+elif [ "$NOTIFY_SERVICESTATE" = "WARNING" ]; then
+  ICON=$warn_ico
+elif [ "$NOTIFY_SERVICESTATE" = "CRITICAL" ]; then
+  ICON=$error_ico
+fi
+
+if [ -n "$NOTIFY_HOSTSTATE" ]; then
+  BODY="${ICON} HOST: ${NOTIFY_HOSTNAME}\nState: ${NOTIFY_HOSTSTATE}\nMESSAGE: ${NOTIFY_HOSTOUTPUT}\nDate/Time: ${NOTIFY_SHORTDATETIME}\nhttps://${MONITORING_HOST}/${NOTIFY_OMD_SITE}${NOTIFY_HOSTURL}"
+fi
+
+if [ -n "$NOTIFY_SERVICESTATE" ]; then
+  BODY="${ICON} HOST: ${NOTIFY_HOSTNAME} SERVICE: ${NOTIFY_SERVICEDESC}\nState: ${NOTIFY_SERVICESTATE}\nMESSAGE: ${NOTIFY_SERVICEOUTPUT}\nDate/Time: ${NOTIFY_SHORTDATETIME}\nhttps://${MONITORING_HOST}/${NOTIFY_OMD_SITE}${NOTIFY_HOSTURL}"
+fi
+
+echo -e "$BODY" | ~/local/bin/sendtomatrix -f ~/local/sendtomatrix.conf

@@ -81,3 +81,13 @@ SHELL=/bin/bash
 The last example allows appending e.g. the fqdn of the server and custom text to a message.
 
 With this approach it's possible to send the same message from different servers to the same room and still be able to keep track from which server the message originates.
+
+## Nagios / Icinga / Check_MK Integration
+
+The sendtomatrix-wrapper-nagios script is an example notification script for nagios compatible monitoring systems.
+
+It requires an installed and configured sendtomatrix script because it just formats and then pipes a message to it.
+
+In check_mk it can be used as is. If you wand to use it with other monitoring cores you maybe need to adjust the variables.
+
+![Nagios Notification](nagios-notification.png)
