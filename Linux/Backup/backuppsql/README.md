@@ -19,6 +19,18 @@ Create a full backup every day at 2am
 0 2 * * * root /usr/local/sbin/backupmysql
 ```
 
+## Restoring backup
+
+Restore needs to be done as user postgres for the following command.
+
+```
+su - postgres
+psql
+create database DATABASE owner OWNER;
+\q
+pg_restore -d DATABASE -j 4 /opt/backup/postgres/DATABASE.dump
+```
+
 Written by [Craig Sanders](https://github.com/ulmen/backup_postgresql/blob/master/backup-postgresql.sh), this script is public domain. Feel free to use or modify as you like.
 
 Modified by Madic - madic@geekbundle.org

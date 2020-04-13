@@ -18,8 +18,8 @@ DUMPALL="sudo -u $USER $(which pg_dumpall)"
 PGDUMP="sudo -u $USER $(which pg_dump)"
 PSQL="sudo -u $USER $(which psql)"
 
-SENDMAIL="1"
-MAILREC="admin@iplabs.de"
+SENDMAIL="0"
+MAILREC="madic@geekbundle.org"
 MACHINE=$(hostname)@$(hostname -d)
 FQDN=$(hostname -f)
 
@@ -55,7 +55,7 @@ fi
 
 # now loop through each individual database and backup the schema and data separately
 for database in $DBS; do
-	DATA=$DIR/$database.bak
+	DATA=$DIR/$database.dump
 
 	echo -e "\nInfo: Backing up $database"
 	$PGDUMP -Fc $database >$DATA
