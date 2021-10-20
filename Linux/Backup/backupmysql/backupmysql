@@ -63,12 +63,16 @@ ndoutils
 MYSQL=$(which mysql)
 MYSQLDUMP=$(which mysqldump)
 GZIP=$(which gzip)
+PT_SHOW_GRANTS=$(which pt-show-grants)
 
 # Write to $LOGDIR
 exec &>"$LOG"
 
 ### Get the list of available databases ###
 DBS="$($MYSQL -u $MUSER -p$MPASS -h $MHOST -P $MPORT -Bse 'show databases')"
+
+### Backup Users ###
+"$PT_SHOW_GRANTS" | "$GZIP" > "$BACKUPDIR/$NOWD-users.sql.gz"
 
 ### Backup DBs ###
 for db in $DBS; do
