@@ -127,7 +127,7 @@ if [ "$CHECKSUM" == "$CHECKOUTS" ]; then
 	fi
 fi
 
-end=(date +%s)
+end=$(($(date +%s) - $start))
 runtime=$(date -u -d @${end} +"%T")
 echo -e "\n$(date +"%Y-%m-%d %H:%M:%S") Script runtime: $runtime"
 
